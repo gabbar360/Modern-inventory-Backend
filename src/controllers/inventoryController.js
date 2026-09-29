@@ -1,9 +1,9 @@
-const { v4: uuidv4 } = require('uuid');
-const { Warehouse, StockLedger } = require('../models/Inventory');
-const { Product } = require('../models/Product');
+import { v4 as uuidv4 } from 'uuid';
+import { Warehouse, StockLedger } from '../models/Inventory.js';
+import { Product } from '../models/Product.js';
 
 // ---------------- WAREHOUSES ----------------
-exports.getWarehouses = async (req, res) => {
+export const getWarehouses = async (req, res) => {
   try {
     const warehouses = await Warehouse.find({ organization_id: req.user.organization_id });
     res.json(warehouses);
@@ -12,7 +12,7 @@ exports.getWarehouses = async (req, res) => {
   }
 };
 
-exports.createWarehouse = async (req, res) => {
+export const createWarehouse = async (req, res) => {
   try {
     const id = `wh_${uuidv4().slice(0, 8)}`;
     const warehouse = await Warehouse.create({
@@ -27,7 +27,7 @@ exports.createWarehouse = async (req, res) => {
 };
 
 // ---------------- STOCK LEDGER & ADJUSTMENTS ----------------
-exports.getStockLedger = async (req, res) => {
+export const getStockLedger = async (req, res) => {
   try {
     const ledger = await StockLedger.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
     res.json(ledger);
@@ -36,7 +36,7 @@ exports.getStockLedger = async (req, res) => {
   }
 };
 
-exports.adjustStock = async (req, res) => {
+export const adjustStock = async (req, res) => {
   try {
     const { product_id, type, quantity, notes } = req.body;
     if (!product_id || !type || !quantity) {
@@ -78,7 +78,7 @@ exports.adjustStock = async (req, res) => {
   }
 };
 
-exports.getReorderAlerts = async (req, res) => {
+export const getReorderAlerts = async (req, res) => {
   try {
     const products = await Product.find({ organization_id: req.user.organization_id });
     const lowStock = products.filter(p => p.stock <= (p.min_stock_alert || 5));
@@ -86,4 +86,12 @@ exports.getReorderAlerts = async (req, res) => {
   } catch (err) {
     res.status(500).json({ detail: err.message });
   }
+};
+
+export default {
+  getWarehouses,
+  createWarehouse,
+  getStockLedger,
+  adjustStock,
+  getReorderAlerts
 };

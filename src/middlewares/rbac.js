@@ -1,4 +1,4 @@
-const requireRole = (allowedRoles = []) => {
+export const requireRole = (allowedRoles = []) => {
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ detail: 'Unauthorized access' });
@@ -14,4 +14,4 @@ const requireRole = (allowedRoles = []) => {
   };
 };
 
-module.exports = { requireRole };
+export default { requireRole };

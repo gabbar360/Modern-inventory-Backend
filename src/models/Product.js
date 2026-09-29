@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ProductSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
@@ -31,7 +31,7 @@ const BrandSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now }
 });
 
-module.exports = {
-  Product: mongoose.models.Product || mongoose.model('Product', ProductSchema),
-  Brand: mongoose.models.Brand || mongoose.model('Brand', BrandSchema)
-};
+export const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema);
+export const Brand = mongoose.models.Brand || mongoose.model('Brand', BrandSchema);
+
+export default { Product, Brand };

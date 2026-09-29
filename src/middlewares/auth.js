@@ -1,8 +1,9 @@
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../config/env');
-const { User } = require('../models/User');
+import jwt from 'jsonwebtoken';
+import { User } from '../models/User.js';
 
-const authenticateToken = async (req, res, next) => {
+const JWT_SECRET = process.env.JWT_SECRET || 'vegnar_erp_super_secret_jwt_key_2026_prod';
+
+export const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization || req.headers.Authorization;
     let token = null;
@@ -38,4 +39,4 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-module.exports = { authenticateToken };
+export default { authenticateToken };

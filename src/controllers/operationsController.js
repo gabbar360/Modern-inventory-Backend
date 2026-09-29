@@ -1,13 +1,13 @@
-const { v4: uuidv4 } = require('uuid');
-const { Invoice, Quotation, SalesOrder } = require('../models/Invoice');
-const { Product } = require('../models/Product');
-const { Customer } = require('../models/Customer');
-const { Expense, Task, StockLedger, AuditLog } = require('../models/Inventory');
-const { User } = require('../models/User');
-const {
+import { v4 as uuidv4 } from 'uuid';
+import { Invoice, Quotation, SalesOrder } from '../models/Invoice.js';
+import { Product } from '../models/Product.js';
+import { Customer } from '../models/Customer.js';
+import { Expense, Task, StockLedger, AuditLog } from '../models/Inventory.js';
+import { User } from '../models/User.js';
+import {
   JournalEntry, AutomationRule, Template, Broadcast,
   Dispatch, Challan, Payment, Approval
-} = require('../models/Operations');
+} from '../models/Operations.js';
 
 // Helper to seed default data if collection is empty
 const ensureSeedData = async (orgId) => {
@@ -119,18 +119,18 @@ let mockNotifications = [
   { id: 'n2', title: 'New Quotation Request', message: 'Quotation QT-1024 requested by Acme Corp.', read: false, created_at: new Date().toISOString() }
 ];
 
-exports.getNotifications = async (req, res) => {
+export const getNotifications = async (req, res) => {
   res.json(mockNotifications);
 };
 
-exports.markNotificationRead = async (req, res) => {
+export const markNotificationRead = async (req, res) => {
   const { id } = req.params;
   mockNotifications = mockNotifications.map(n => n.id === id ? { ...n, read: true } : n);
   res.json({ success: true });
 };
 
 // Approvals
-exports.getPendingApprovals = async (req, res) => {
+export const getPendingApprovals = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
     await ensureSeedData(orgId);
@@ -152,7 +152,7 @@ exports.getPendingApprovals = async (req, res) => {
   }
 };
 
-exports.getApprovals = async (req, res) => {
+export const getApprovals = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
     const approvals = await Approval.find({ organization_id: orgId }).lean();
@@ -165,7 +165,7 @@ exports.getApprovals = async (req, res) => {
   }
 };
 
-exports.approveDocument = async (req, res) => {
+export const approveDocument = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -176,11 +176,11 @@ exports.approveDocument = async (req, res) => {
   }
 };
 
-exports.approveItem = async (req, res) => {
+export const approveItem = async (req, res) => {
   res.json({ success: true, message: 'Approved' });
 };
 
-exports.rejectItem = async (req, res) => {
+export const rejectItem = async (req, res) => {
   res.json({ success: true, message: 'Rejected' });
 };
 
@@ -189,11 +189,11 @@ let aiHistory = [
   { role: 'assistant', content: 'Hello! I am your Vegnar ERP & CRM Copilot. How can I assist you with your sales, inventory, or analytics today?', timestamp: new Date().toISOString() }
 ];
 
-exports.getAiHistory = async (req, res) => {
+export const getAiHistory = async (req, res) => {
   res.json(aiHistory);
 };
 
-exports.postAiChat = async (req, res) => {
+export const postAiChat = async (req, res) => {
   const { prompt, message } = req.body;
   const userMsg = prompt || message || '';
   aiHistory.push({ role: 'user', content: userMsg, timestamp: new Date().toISOString() });
@@ -204,7 +204,7 @@ exports.postAiChat = async (req, res) => {
   res.json({ reply: botReply, history: aiHistory });
 };
 
-exports.parseAiOrder = async (req, res) => {
+export const parseAiOrder = async (req, res) => {
   const { text, audio_text } = req.body;
   res.json({
     success: true,
@@ -218,20 +218,20 @@ exports.parseAiOrder = async (req, res) => {
 };
 
 // Organization & Custom Fields
-exports.updateOrganization = async (req, res) => {
+export const updateOrganization = async (req, res) => {
   res.json({ success: true, message: 'Organization settings updated successfully' });
 };
 
-exports.saveCustomFields = async (req, res) => {
+export const saveCustomFields = async (req, res) => {
   res.json({ success: true, message: 'Custom fields saved' });
 };
 
-exports.importData = async (req, res) => {
+export const importData = async (req, res) => {
   res.json({ success: true, imported_count: 25, message: 'Data imported successfully' });
 };
 
 // Pincode & Freight Logistics
-exports.getPincodeInfo = async (req, res) => {
+export const getPincodeInfo = async (req, res) => {
   const { pincode } = req.params;
   res.json({
     pincode: pincode || '421302',
@@ -242,7 +242,7 @@ exports.getPincodeInfo = async (req, res) => {
   });
 };
 
-exports.getFreightEstimate = async (req, res) => {
+export const getFreightEstimate = async (req, res) => {
   res.json({
     success: true,
     estimated_cost: 450,
@@ -251,12 +251,12 @@ exports.getFreightEstimate = async (req, res) => {
   });
 };
 
-exports.scanLowStock = async (req, res) => {
+export const scanLowStock = async (req, res) => {
   res.json({ success: true, scanned_items: 12, low_stock_found: 2, message: 'Low stock scan completed' });
 };
 
 // Broadcasts
-exports.getBroadcasts = async (req, res) => {
+export const getBroadcasts = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
     const items = await Broadcast.find({ organization_id: orgId }).sort({ created_at: -1 }).lean();
@@ -266,7 +266,7 @@ exports.getBroadcasts = async (req, res) => {
   }
 };
 
-exports.createBroadcast = async (req, res) => {
+export const createBroadcast = async (req, res) => {
   try {
     const newBc = new Broadcast({
       id: `bc_${uuidv4().slice(0, 8)}`,
@@ -286,7 +286,7 @@ exports.createBroadcast = async (req, res) => {
 };
 
 // Dispatches
-exports.getDispatches = async (req, res) => {
+export const getDispatches = async (req, res) => {
   try {
     const items = await Dispatch.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 }).lean();
     res.json(items);
@@ -295,7 +295,7 @@ exports.getDispatches = async (req, res) => {
   }
 };
 
-exports.createDispatch = async (req, res) => {
+export const createDispatch = async (req, res) => {
   try {
     const newDsp = new Dispatch({
       id: `dsp_${uuidv4().slice(0, 8)}`,
@@ -313,7 +313,7 @@ exports.createDispatch = async (req, res) => {
   }
 };
 
-exports.trackDispatch = async (req, res) => {
+export const trackDispatch = async (req, res) => {
   try {
     const { id } = req.params;
     const d = await Dispatch.findOne({ id }) || { id, courier: 'Delhivery B2B', tracking_number: 'TRK100', status: 'in_transit' };
@@ -330,7 +330,7 @@ exports.trackDispatch = async (req, res) => {
 };
 
 // Challans
-exports.getChallans = async (req, res) => {
+export const getChallans = async (req, res) => {
   try {
     const items = await Challan.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 }).lean();
     res.json(items);
@@ -339,7 +339,7 @@ exports.getChallans = async (req, res) => {
   }
 };
 
-exports.createChallan = async (req, res) => {
+export const createChallan = async (req, res) => {
   try {
     const newCh = new Challan({
       id: `ch_${uuidv4().slice(0, 8)}`,
@@ -358,7 +358,7 @@ exports.createChallan = async (req, res) => {
 };
 
 // Payments Received & Payments Made
-exports.getPayments = async (req, res) => {
+export const getPayments = async (req, res) => {
   try {
     const items = await Payment.find({ organization_id: req.user.organization_id, payment_type: 'received' }).sort({ created_at: -1 }).lean();
     res.json(items);
@@ -367,7 +367,7 @@ exports.getPayments = async (req, res) => {
   }
 };
 
-exports.createPayment = async (req, res) => {
+export const createPayment = async (req, res) => {
   try {
     const p = new Payment({
       id: `pmt_${uuidv4().slice(0, 8)}`,
@@ -386,7 +386,7 @@ exports.createPayment = async (req, res) => {
   }
 };
 
-exports.getPaymentsMade = async (req, res) => {
+export const getPaymentsMade = async (req, res) => {
   try {
     const items = await Payment.find({ organization_id: req.user.organization_id, payment_type: 'made' }).sort({ created_at: -1 }).lean();
     res.json(items);
@@ -395,7 +395,7 @@ exports.getPaymentsMade = async (req, res) => {
   }
 };
 
-exports.createPaymentMade = async (req, res) => {
+export const createPaymentMade = async (req, res) => {
   try {
     const p = new Payment({
       id: `pmtm_${uuidv4().slice(0, 8)}`,
@@ -415,7 +415,7 @@ exports.createPaymentMade = async (req, res) => {
 };
 
 // Reorder Suggestions
-exports.getReorderSuggestions = async (req, res) => {
+export const getReorderSuggestions = async (req, res) => {
   try {
     const products = await Product.find({ organization_id: req.user.organization_id }).lean();
     const suggestions = products
@@ -465,13 +465,13 @@ exports.getReorderSuggestions = async (req, res) => {
   }
 };
 
-exports.createReorderPO = async (req, res) => {
+export const createReorderPO = async (req, res) => {
   const poNumber = `PO-${Math.floor(1000 + Math.random() * 9000)}`;
   res.status(201).json({ success: true, number: poNumber, message: "Auto-PO created successfully" });
 };
 
 // Stock movements & stock health
-exports.getStockMovements = async (req, res) => {
+export const getStockMovements = async (req, res) => {
   try {
     const movements = await StockLedger.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 }).lean();
     res.json(movements);
@@ -480,7 +480,7 @@ exports.getStockMovements = async (req, res) => {
   }
 };
 
-exports.getStockHealth = async (req, res) => {
+export const getStockHealth = async (req, res) => {
   try {
     const products = await Product.find({ organization_id: req.user.organization_id }).lean();
     const healthy = products.filter(p => p.stock > (p.min_stock_alert || 5)).length;
@@ -506,22 +506,22 @@ let debitNotes = [
   { id: 'dn_1', number: 'DN-001', vendor_name: 'Global Raw Materials', amount: 2000, reason: 'Shortage in Delivery', date: new Date().toISOString().slice(0, 10) }
 ];
 
-exports.getCreditNotes = async (req, res) => res.json(creditNotes);
-exports.createCreditNote = async (req, res) => {
+export const getCreditNotes = async (req, res) => res.json(creditNotes);
+export const createCreditNote = async (req, res) => {
   const item = { id: `cn_${uuidv4().slice(0,8)}`, number: `CN-00${creditNotes.length + 1}`, ...req.body };
   creditNotes.unshift(item);
   res.status(201).json(item);
 };
 
-exports.getDebitNotes = async (req, res) => res.json(debitNotes);
-exports.createDebitNote = async (req, res) => {
+export const getDebitNotes = async (req, res) => res.json(debitNotes);
+export const createDebitNote = async (req, res) => {
   const item = { id: `dn_${uuidv4().slice(0,8)}`, number: `DN-00${debitNotes.length + 1}`, ...req.body };
   debitNotes.unshift(item);
   res.status(201).json(item);
 };
 
 // Journal Entries (Accounting / Ledger)
-exports.getJournalEntries = async (req, res) => {
+export const getJournalEntries = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
     await ensureSeedData(orgId);
@@ -533,7 +533,7 @@ exports.getJournalEntries = async (req, res) => {
 };
 
 // Users & Roles
-exports.getUsers = async (req, res) => {
+export const getUsers = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
     const users = await User.find({ organization_id: orgId }, { password_hash: 0 }).lean();
@@ -546,7 +546,7 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-exports.inviteUser = async (req, res) => {
+export const inviteUser = async (req, res) => {
   try {
     const newUser = new User({
       id: `usr_${uuidv4().slice(0, 8)}`,
@@ -563,7 +563,7 @@ exports.inviteUser = async (req, res) => {
   }
 };
 
-exports.updateUserRole = async (req, res) => {
+export const updateUserRole = async (req, res) => {
   try {
     const { id } = req.params;
     const { role } = req.body;
@@ -575,7 +575,7 @@ exports.updateUserRole = async (req, res) => {
 };
 
 // Templates
-exports.getTemplates = async (req, res) => {
+export const getTemplates = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
     await ensureSeedData(orgId);
@@ -586,7 +586,7 @@ exports.getTemplates = async (req, res) => {
   }
 };
 
-exports.createTemplate = async (req, res) => {
+export const createTemplate = async (req, res) => {
   try {
     const newTmpl = new Template({
       id: `tmpl_${uuidv4().slice(0, 8)}`,
@@ -607,7 +607,7 @@ exports.createTemplate = async (req, res) => {
 };
 
 // Automation Rules
-exports.getAutomationRules = async (req, res) => {
+export const getAutomationRules = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
     await ensureSeedData(orgId);
@@ -618,7 +618,7 @@ exports.getAutomationRules = async (req, res) => {
   }
 };
 
-exports.createAutomationRule = async (req, res) => {
+export const createAutomationRule = async (req, res) => {
   try {
     const rule = new AutomationRule({
       id: `rule_${uuidv4().slice(0, 8)}`,
@@ -636,7 +636,7 @@ exports.createAutomationRule = async (req, res) => {
   }
 };
 
-exports.toggleAutomationRule = async (req, res) => {
+export const toggleAutomationRule = async (req, res) => {
   try {
     const { id } = req.params;
     const { enabled } = req.body;
@@ -648,7 +648,7 @@ exports.toggleAutomationRule = async (req, res) => {
 };
 
 // Audit Logs
-exports.getAuditLogs = async (req, res) => {
+export const getAuditLogs = async (req, res) => {
   try {
     const items = await AuditLog.find({ organization_id: req.user.organization_id }).sort({ timestamp: -1, created_at: -1 }).lean();
     if (items.length === 0) {
@@ -664,7 +664,7 @@ exports.getAuditLogs = async (req, res) => {
 };
 
 // Tasks
-exports.getTasks = async (req, res) => {
+export const getTasks = async (req, res) => {
   try {
     const tasks = await Task.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 }).lean();
     res.json(tasks);
@@ -673,7 +673,7 @@ exports.getTasks = async (req, res) => {
   }
 };
 
-exports.createTask = async (req, res) => {
+export const createTask = async (req, res) => {
   try {
     const task = new Task({
       id: `tsk_${uuidv4().slice(0,8)}`,
@@ -691,14 +691,14 @@ exports.createTask = async (req, res) => {
 };
 
 // Integration configs (WhatsApp, Email, Courier)
-exports.getWhatsappConfig = async (req, res) => res.json({ enabled: true, phone_number: '+919876543210' });
-exports.getWhatsappStatus = async (req, res) => res.json({ connected: true, status: 'authenticated' });
-exports.getWhatsappQrcode = async (req, res) => res.json({ qrcode: 'data:image/png;base64,mockqr' });
-exports.getEmailConfig = async (req, res) => res.json({ smtp_host: 'smtp.gmail.com', smtp_port: 587, sender_email: 'noreply@vegnar.com' });
-exports.getCourierConfig = async (req, res) => res.json({ partner: 'Delhivery', api_key_configured: true });
+export const getWhatsappConfig = async (req, res) => res.json({ enabled: true, phone_number: '+919876543210' });
+export const getWhatsappStatus = async (req, res) => res.json({ connected: true, status: 'authenticated' });
+export const getWhatsappQrcode = async (req, res) => res.json({ qrcode: 'data:image/png;base64,mockqr' });
+export const getEmailConfig = async (req, res) => res.json({ smtp_host: 'smtp.gmail.com', smtp_port: 587, sender_email: 'noreply@vegnar.com' });
+export const getCourierConfig = async (req, res) => res.json({ partner: 'Delhivery', api_key_configured: true });
 
 // Dashboard stats
-exports.getDashboardStats = async (req, res) => {
+export const getDashboardStats = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
     const [invoices, customers, products, expenses, quotations, salesOrders] = await Promise.all([
@@ -766,7 +766,7 @@ exports.getDashboardStats = async (req, res) => {
 };
 
 // Global Search
-exports.globalSearch = async (req, res) => {
+export const globalSearch = async (req, res) => {
   try {
     const { q } = req.query;
     if (!q || q.length < 2) return res.json({ results: [] });
@@ -790,4 +790,62 @@ exports.globalSearch = async (req, res) => {
   } catch (err) {
     res.status(500).json({ detail: err.message });
   }
+};
+
+export default {
+  ensureSeedData,
+  getNotifications,
+  markNotificationRead,
+  getPendingApprovals,
+  getApprovals,
+  approveDocument,
+  approveItem,
+  rejectItem,
+  getAiHistory,
+  postAiChat,
+  parseAiOrder,
+  updateOrganization,
+  saveCustomFields,
+  importData,
+  getPincodeInfo,
+  getFreightEstimate,
+  scanLowStock,
+  getBroadcasts,
+  createBroadcast,
+  getDispatches,
+  createDispatch,
+  trackDispatch,
+  getChallans,
+  createChallan,
+  getPayments,
+  createPayment,
+  getPaymentsMade,
+  createPaymentMade,
+  getReorderSuggestions,
+  createReorderPO,
+  getStockMovements,
+  getStockHealth,
+  getCreditNotes,
+  createCreditNote,
+  getDebitNotes,
+  createDebitNote,
+  getJournalEntries,
+  getUsers,
+  inviteUser,
+  updateUserRole,
+  getTemplates,
+  createTemplate,
+  getAutomationRules,
+  createAutomationRule,
+  toggleAutomationRule,
+  getAuditLogs,
+  getTasks,
+  createTask,
+  getWhatsappConfig,
+  getWhatsappStatus,
+  getWhatsappQrcode,
+  getEmailConfig,
+  getCourierConfig,
+  getDashboardStats,
+  globalSearch
 };

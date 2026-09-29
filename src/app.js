@@ -1,7 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const apiRouter = require('./routes');
-const errorHandler = require('./middlewares/errorHandler');
+import express from 'express';
+import cors from 'cors';
+import apiRouter from './routes/index.js';
+import errorHandler from './middlewares/errorHandler.js';
 
 const app = express();
 
@@ -16,4 +16,4 @@ app.use('/api', apiRouter);
 // Global Error Handler
 app.use(errorHandler);
 
-module.exports = app;
+export default app;

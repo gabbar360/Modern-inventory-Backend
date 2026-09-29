@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import inventoryController from '../controllers/inventoryController.js';
+import { authenticateToken } from '../middlewares/auth.js';
+
 const router = express.Router();
-const inventoryController = require('../controllers/inventoryController');
-const { authenticateToken } = require('../middlewares/auth');
 
 router.use(authenticateToken);
 
@@ -17,4 +18,4 @@ router.post('/inventory/clearance-offer', (req, res) => res.json({ success: true
 router.get('/reorder-alerts', inventoryController.getReorderAlerts);
 router.patch('/tasks/:id', (req, res) => res.json({ success: true, message: 'Task updated successfully' }));
 
-module.exports = router;
+export default router;

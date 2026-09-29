@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const WarehouseSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
@@ -70,10 +70,16 @@ const AuditLogSchema = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now }
 });
 
-module.exports = {
-  Warehouse: mongoose.models.Warehouse || mongoose.model('Warehouse', WarehouseSchema),
-  StockLedger: mongoose.models.StockLedger || mongoose.model('StockLedger', StockLedgerSchema),
-  Expense: mongoose.models.Expense || mongoose.model('Expense', ExpenseSchema),
-  Task: mongoose.models.Task || mongoose.model('Task', TaskSchema),
-  AuditLog: mongoose.models.AuditLog || mongoose.model('AuditLog', AuditLogSchema)
+export const Warehouse = mongoose.models.Warehouse || mongoose.model('Warehouse', WarehouseSchema);
+export const StockLedger = mongoose.models.StockLedger || mongoose.model('StockLedger', StockLedgerSchema);
+export const Expense = mongoose.models.Expense || mongoose.model('Expense', ExpenseSchema);
+export const Task = mongoose.models.Task || mongoose.model('Task', TaskSchema);
+export const AuditLog = mongoose.models.AuditLog || mongoose.model('AuditLog', AuditLogSchema);
+
+export default {
+  Warehouse,
+  StockLedger,
+  Expense,
+  Task,
+  AuditLog
 };

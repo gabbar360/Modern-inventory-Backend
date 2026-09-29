@@ -1,8 +1,8 @@
-const { v4: uuidv4 } = require('uuid');
-const { Vendor, PurchaseOrder, VendorBill } = require('../models/Vendor');
+import { v4 as uuidv4 } from 'uuid';
+import { Vendor, PurchaseOrder, VendorBill } from '../models/Vendor.js';
 
 // ---------------- VENDORS ----------------
-exports.getVendors = async (req, res) => {
+export const getVendors = async (req, res) => {
   try {
     const vendors = await Vendor.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
     res.json(vendors);
@@ -11,7 +11,7 @@ exports.getVendors = async (req, res) => {
   }
 };
 
-exports.createVendor = async (req, res) => {
+export const createVendor = async (req, res) => {
   try {
     const id = `vnd_${uuidv4().slice(0, 8)}`;
     const vendor = await Vendor.create({
@@ -25,7 +25,7 @@ exports.createVendor = async (req, res) => {
   }
 };
 
-exports.updateVendor = async (req, res) => {
+export const updateVendor = async (req, res) => {
   try {
     const vendor = await Vendor.findOneAndUpdate(
       { id: req.params.id, organization_id: req.user.organization_id },
@@ -39,7 +39,7 @@ exports.updateVendor = async (req, res) => {
   }
 };
 
-exports.deleteVendor = async (req, res) => {
+export const deleteVendor = async (req, res) => {
   try {
     await Vendor.findOneAndDelete({ id: req.params.id, organization_id: req.user.organization_id });
     res.json({ message: 'Vendor deleted successfully' });
@@ -48,9 +48,8 @@ exports.deleteVendor = async (req, res) => {
   }
 };
 
-
 // ---------------- PURCHASE ORDERS ----------------
-exports.getPurchaseOrders = async (req, res) => {
+export const getPurchaseOrders = async (req, res) => {
   try {
     const pos = await PurchaseOrder.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
     res.json(pos);
@@ -59,7 +58,7 @@ exports.getPurchaseOrders = async (req, res) => {
   }
 };
 
-exports.createPurchaseOrder = async (req, res) => {
+export const createPurchaseOrder = async (req, res) => {
   try {
     const id = `po_${uuidv4().slice(0, 8)}`;
     const count = await PurchaseOrder.countDocuments({ organization_id: req.user.organization_id });
@@ -78,7 +77,7 @@ exports.createPurchaseOrder = async (req, res) => {
 };
 
 // ---------------- VENDOR BILLS ----------------
-exports.getVendorBills = async (req, res) => {
+export const getVendorBills = async (req, res) => {
   try {
     const bills = await VendorBill.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
     res.json(bills);
@@ -87,7 +86,7 @@ exports.getVendorBills = async (req, res) => {
   }
 };
 
-exports.createVendorBill = async (req, res) => {
+export const createVendorBill = async (req, res) => {
   try {
     const id = `bill_${uuidv4().slice(0, 8)}`;
     const count = await VendorBill.countDocuments({ organization_id: req.user.organization_id });
@@ -104,4 +103,15 @@ exports.createVendorBill = async (req, res) => {
   } catch (err) {
     res.status(500).json({ detail: err.message });
   }
+};
+
+export default {
+  getVendors,
+  createVendor,
+  updateVendor,
+  deleteVendor,
+  getPurchaseOrders,
+  createPurchaseOrder,
+  getVendorBills,
+  createVendorBill
 };

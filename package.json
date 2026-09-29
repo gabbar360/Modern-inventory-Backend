@@ -19,5 +19,6 @@
     "nodemailer": "^9.1.1",
     "pdfkit": "^0.16.0",
     "uuid": "^11.0.5"
-  }
+  },
+  "type": "module"
 }

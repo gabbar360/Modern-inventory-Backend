@@ -1,10 +1,10 @@
-const { v4: uuidv4 } = require('uuid');
-const { Invoice, Quotation, SalesOrder } = require('../models/Invoice');
-const { Product } = require('../models/Product');
-const { Customer } = require('../models/Customer');
+import { v4 as uuidv4 } from 'uuid';
+import { Invoice, Quotation, SalesOrder } from '../models/Invoice.js';
+import { Product } from '../models/Product.js';
+import { Customer } from '../models/Customer.js';
 
 // Helper to auto-calculate item line values & totals
-function calculateTotals(items = [], stateType = 'intra') {
+export function calculateTotals(items = [], stateType = 'intra') {
   let subtotal = 0;
   let totalTax = 0;
 
@@ -55,7 +55,7 @@ function calculateTotals(items = [], stateType = 'intra') {
 }
 
 // ---------------- INVOICES ----------------
-exports.getInvoices = async (req, res) => {
+export const getInvoices = async (req, res) => {
   try {
     const invoices = await Invoice.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
     res.json(invoices);
@@ -64,7 +64,7 @@ exports.getInvoices = async (req, res) => {
   }
 };
 
-exports.getInvoiceById = async (req, res) => {
+export const getInvoiceById = async (req, res) => {
   try {
     const invoice = await Invoice.findOne({ id: req.params.id, organization_id: req.user.organization_id });
     if (!invoice) return res.status(404).json({ detail: 'Invoice not found' });
@@ -74,7 +74,7 @@ exports.getInvoiceById = async (req, res) => {
   }
 };
 
-exports.createInvoice = async (req, res) => {
+export const createInvoice = async (req, res) => {
   try {
     const id = `inv_${uuidv4().slice(0, 8)}`;
     const count = await Invoice.countDocuments({ organization_id: req.user.organization_id });
@@ -112,7 +112,7 @@ exports.createInvoice = async (req, res) => {
   }
 };
 
-exports.updateInvoice = async (req, res) => {
+export const updateInvoice = async (req, res) => {
   try {
     const { items, subtotal, total_tax, cgst, sgst, igst, total } = calculateTotals(req.body.items || []);
 
@@ -141,7 +141,7 @@ exports.updateInvoice = async (req, res) => {
 };
 
 // ---------------- QUOTATIONS ----------------
-exports.getQuotations = async (req, res) => {
+export const getQuotations = async (req, res) => {
   try {
     const quotations = await Quotation.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
     res.json(quotations);
@@ -150,7 +150,7 @@ exports.getQuotations = async (req, res) => {
   }
 };
 
-exports.createQuotation = async (req, res) => {
+export const createQuotation = async (req, res) => {
   try {
     const id = `quote_${uuidv4().slice(0, 8)}`;
     const count = await Quotation.countDocuments({ organization_id: req.user.organization_id });
@@ -184,7 +184,7 @@ exports.createQuotation = async (req, res) => {
   }
 };
 
-exports.getQuotationById = async (req, res) => {
+export const getQuotationById = async (req, res) => {
   try {
     const q = await Quotation.findOne({ id: req.params.id, organization_id: req.user.organization_id }).lean();
     if (!q) {
@@ -208,7 +208,7 @@ exports.getQuotationById = async (req, res) => {
   }
 };
 
-exports.updateQuotationStatus = async (req, res) => {
+export const updateQuotationStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -219,7 +219,7 @@ exports.updateQuotationStatus = async (req, res) => {
   }
 };
 
-exports.convertQuotationToSO = async (req, res) => {
+export const convertQuotationToSO = async (req, res) => {
   try {
     const { id } = req.params;
     const q = await Quotation.findOne({ id, organization_id: req.user.organization_id });
@@ -230,48 +230,48 @@ exports.convertQuotationToSO = async (req, res) => {
   }
 };
 
-exports.getQuotationPdf = async (req, res) => {
+export const getQuotationPdf = async (req, res) => {
   res.setHeader('Content-Type', 'application/pdf');
   res.send(Buffer.from('%PDF-1.4 Mock Quotation PDF Content', 'utf-8'));
 };
 
-exports.sendQuotationEmail = async (req, res) => {
+export const sendQuotationEmail = async (req, res) => {
   res.json({ success: true, to: 'client@example.com', message: 'Quotation sent via email' });
 };
 
 // ---------------- INVOICE SUB-RESOURCES ----------------
-exports.getInvoicePdf = async (req, res) => {
+export const getInvoicePdf = async (req, res) => {
   res.setHeader('Content-Type', 'application/pdf');
   res.send(Buffer.from('%PDF-1.4 Mock Invoice PDF Content', 'utf-8'));
 };
 
-exports.sendInvoiceEmail = async (req, res) => {
+export const sendInvoiceEmail = async (req, res) => {
   res.json({ success: true, to: 'client@example.com', message: 'Invoice email sent' });
 };
 
-exports.sendInvoiceReminder = async (req, res) => {
+export const sendInvoiceReminder = async (req, res) => {
   res.json({ success: true, to: 'client@example.com', message: 'Payment reminder sent' });
 };
 
-exports.ewayBillGenerate = async (req, res) => {
+export const ewayBillGenerate = async (req, res) => {
   res.json({ success: true, eway_bill_number: `EWB${Math.floor(100000000000 + Math.random() * 900000000000)}`, status: 'generated' });
 };
 
-exports.ewayBillUpdateVehicle = async (req, res) => {
+export const ewayBillUpdateVehicle = async (req, res) => {
   res.json({ success: true, message: 'Vehicle updated successfully' });
 };
 
-exports.ewayBillCancel = async (req, res) => {
+export const ewayBillCancel = async (req, res) => {
   res.json({ success: true, message: 'E-Way Bill cancelled' });
 };
 
-exports.getEwayBillSlip = async (req, res) => {
+export const getEwayBillSlip = async (req, res) => {
   res.setHeader('Content-Type', 'application/pdf');
   res.send(Buffer.from('%PDF-1.4 Mock Eway Bill Slip', 'utf-8'));
 };
 
 // ---------------- SALES ORDERS ----------------
-exports.getSalesOrders = async (req, res) => {
+export const getSalesOrders = async (req, res) => {
   try {
     const orders = await SalesOrder.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
     res.json(orders);
@@ -280,7 +280,7 @@ exports.getSalesOrders = async (req, res) => {
   }
 };
 
-exports.getSalesOrderById = async (req, res) => {
+export const getSalesOrderById = async (req, res) => {
   try {
     const order = await SalesOrder.findOne({ id: req.params.id, organization_id: req.user.organization_id }).lean();
     if (!order) {
@@ -300,7 +300,7 @@ exports.getSalesOrderById = async (req, res) => {
   }
 };
 
-exports.updateSalesOrderStatus = async (req, res) => {
+export const updateSalesOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -311,7 +311,7 @@ exports.updateSalesOrderStatus = async (req, res) => {
   }
 };
 
-exports.createSalesOrder = async (req, res) => {
+export const createSalesOrder = async (req, res) => {
   try {
     const id = `so_${uuidv4().slice(0, 8)}`;
     const count = await SalesOrder.countDocuments({ organization_id: req.user.organization_id });
@@ -334,4 +334,30 @@ exports.createSalesOrder = async (req, res) => {
   } catch (err) {
     res.status(500).json({ detail: err.message });
   }
+};
+
+export default {
+  calculateTotals,
+  getInvoices,
+  getInvoiceById,
+  createInvoice,
+  updateInvoice,
+  getQuotations,
+  createQuotation,
+  getQuotationById,
+  updateQuotationStatus,
+  convertQuotationToSO,
+  getQuotationPdf,
+  sendQuotationEmail,
+  getInvoicePdf,
+  sendInvoiceEmail,
+  sendInvoiceReminder,
+  ewayBillGenerate,
+  ewayBillUpdateVehicle,
+  ewayBillCancel,
+  getEwayBillSlip,
+  getSalesOrders,
+  getSalesOrderById,
+  updateSalesOrderStatus,
+  createSalesOrder
 };

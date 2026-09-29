@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import purchaseController from '../controllers/purchaseController.js';
+import { authenticateToken } from '../middlewares/auth.js';
+
 const router = express.Router();
-const purchaseController = require('../controllers/purchaseController');
-const { authenticateToken } = require('../middlewares/auth');
 
 router.use(authenticateToken);
 
@@ -20,4 +21,4 @@ router.post('/purchase-orders', purchaseController.createPurchaseOrder);
 router.get('/vendor-bills', purchaseController.getVendorBills);
 router.post('/vendor-bills', purchaseController.createVendorBill);
 
-module.exports = router;
+export default router;

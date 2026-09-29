@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import ops from '../controllers/operationsController.js';
+import { authenticateToken } from '../middlewares/auth.js';
+
 const router = express.Router();
-const ops = require('../controllers/operationsController');
-const { authenticateToken } = require('../middlewares/auth');
 
 router.use(authenticateToken);
 
@@ -102,4 +103,4 @@ router.post('/broadcast/send', ops.createBroadcast);
 router.get('/dashboard/stats', ops.getDashboardStats);
 router.get('/search', ops.globalSearch);
 
-module.exports = router;
+export default router;

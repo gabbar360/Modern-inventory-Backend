@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const CustomerSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
@@ -48,7 +48,7 @@ const LeadSchema = new mongoose.Schema({
   updated_at: { type: Date, default: Date.now }
 });
 
-module.exports = {
-  Customer: mongoose.models.Customer || mongoose.model('Customer', CustomerSchema),
-  Lead: mongoose.models.Lead || mongoose.model('Lead', LeadSchema)
-};
+export const Customer = mongoose.models.Customer || mongoose.model('Customer', CustomerSchema);
+export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
+
+export default { Customer, Lead };

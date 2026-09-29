@@ -1,9 +1,9 @@
-const { Invoice, Quotation, SalesOrder } = require('../models/Invoice');
-const { Product } = require('../models/Product');
-const { Customer } = require('../models/Customer');
-const { Expense } = require('../models/Inventory');
+import { Invoice, Quotation, SalesOrder } from '../models/Invoice.js';
+import { Product } from '../models/Product.js';
+import { Customer } from '../models/Customer.js';
+import { Expense } from '../models/Inventory.js';
 
-exports.getDashboardMetrics = async (req, res) => {
+export const getDashboardMetrics = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
 
@@ -35,7 +35,7 @@ exports.getDashboardMetrics = async (req, res) => {
   }
 };
 
-exports.getPnLAnalytics = async (req, res) => {
+export const getPnLAnalytics = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
 
@@ -61,7 +61,7 @@ exports.getPnLAnalytics = async (req, res) => {
   }
 };
 
-exports.getPnLInvoices = async (req, res) => {
+export const getPnLInvoices = async (req, res) => {
   try {
     const invoices = await Invoice.find({ organization_id: req.user.organization_id });
     res.json(invoices);
@@ -70,7 +70,7 @@ exports.getPnLInvoices = async (req, res) => {
   }
 };
 
-exports.getPnLProducts = async (req, res) => {
+export const getPnLProducts = async (req, res) => {
   try {
     const products = await Product.find({ organization_id: req.user.organization_id });
     res.json(products);
@@ -79,7 +79,7 @@ exports.getPnLProducts = async (req, res) => {
   }
 };
 
-exports.getDetailedMonthlyPl = async (req, res) => {
+export const getDetailedMonthlyPl = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
     const [invoices, expenses] = await Promise.all([
@@ -112,7 +112,7 @@ exports.getDetailedMonthlyPl = async (req, res) => {
   }
 };
 
-exports.getExpenses = async (req, res) => {
+export const getExpenses = async (req, res) => {
   try {
     const expenses = await Expense.find({ organization_id: req.user.organization_id }).sort({ expense_date: -1 });
     res.json(expenses);
@@ -121,7 +121,7 @@ exports.getExpenses = async (req, res) => {
   }
 };
 
-exports.getGstSummary = async (req, res) => {
+export const getGstSummary = async (req, res) => {
   try {
     const invoices = await Invoice.find({ organization_id: req.user.organization_id });
     const totalTaxable = invoices.reduce((sum, inv) => sum + (inv.subtotal || 0), 0);
@@ -142,7 +142,7 @@ exports.getGstSummary = async (req, res) => {
   }
 };
 
-exports.getReceivablesAging = async (req, res) => {
+export const getReceivablesAging = async (req, res) => {
   try {
     const invoices = await Invoice.find({ organization_id: req.user.organization_id, status: { $ne: 'paid' } });
     const now = new Date();
@@ -173,4 +173,15 @@ exports.getReceivablesAging = async (req, res) => {
   } catch (err) {
     res.status(500).json({ detail: err.message });
   }
+};
+
+export default {
+  getDashboardMetrics,
+  getPnLAnalytics,
+  getPnLInvoices,
+  getPnLProducts,
+  getDetailedMonthlyPl,
+  getExpenses,
+  getGstSummary,
+  getReceivablesAging
 };

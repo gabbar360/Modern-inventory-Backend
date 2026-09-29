@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const VendorSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
@@ -57,8 +57,12 @@ const VendorBillSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now }
 });
 
-module.exports = {
-  Vendor: mongoose.models.Vendor || mongoose.model('Vendor', VendorSchema),
-  PurchaseOrder: mongoose.models.PurchaseOrder || mongoose.model('PurchaseOrder', PurchaseOrderSchema),
-  VendorBill: mongoose.models.VendorBill || mongoose.model('VendorBill', VendorBillSchema)
+export const Vendor = mongoose.models.Vendor || mongoose.model('Vendor', VendorSchema);
+export const PurchaseOrder = mongoose.models.PurchaseOrder || mongoose.model('PurchaseOrder', PurchaseOrderSchema);
+export const VendorBill = mongoose.models.VendorBill || mongoose.model('VendorBill', VendorBillSchema);
+
+export default {
+  Vendor,
+  PurchaseOrder,
+  VendorBill
 };

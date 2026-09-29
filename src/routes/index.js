@@ -1,15 +1,15 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express';
+import authRoutes from './auth.routes.js';
+import customerRoutes from './customer.routes.js';
+import productRoutes from './product.routes.js';
+import salesRoutes from './sales.routes.js';
+import purchaseRoutes from './purchase.routes.js';
+import inventoryRoutes from './inventory.routes.js';
+import reportRoutes from './report.routes.js';
+import expenseRoutes from './expense.routes.js';
+import operationsRoutes from './operations.routes.js';
 
-const authRoutes = require('./auth.routes');
-const customerRoutes = require('./customer.routes');
-const productRoutes = require('./product.routes');
-const salesRoutes = require('./sales.routes');
-const purchaseRoutes = require('./purchase.routes');
-const inventoryRoutes = require('./inventory.routes');
-const reportRoutes = require('./report.routes');
-const expenseRoutes = require('./expense.routes');
-const operationsRoutes = require('./operations.routes');
+const router = express.Router();
 
 // Health Check
 router.get('/health', (req, res) => {
@@ -32,4 +32,4 @@ router.use('/expenses', expenseRoutes);
 router.use('/reports', reportRoutes);
 router.use('/', operationsRoutes);
 
-module.exports = router;
+export default router;

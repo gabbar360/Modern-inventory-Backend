@@ -1,7 +1,7 @@
-const { v4: uuidv4 } = require('uuid');
-const { Expense } = require('../models/Inventory');
+import { v4 as uuidv4 } from 'uuid';
+import { Expense } from '../models/Inventory.js';
 
-exports.getExpenses = async (req, res) => {
+export const getExpenses = async (req, res) => {
   try {
     const expenses = await Expense.find({ organization_id: req.user.organization_id }).sort({ date: -1, created_at: -1 });
     res.json(expenses);
@@ -10,7 +10,7 @@ exports.getExpenses = async (req, res) => {
   }
 };
 
-exports.getExpenseSummary = async (req, res) => {
+export const getExpenseSummary = async (req, res) => {
   try {
     const expenses = await Expense.find({ organization_id: req.user.organization_id });
     
@@ -53,7 +53,7 @@ exports.getExpenseSummary = async (req, res) => {
   }
 };
 
-exports.createExpense = async (req, res) => {
+export const createExpense = async (req, res) => {
   try {
     const { title, category, subcategory, amount, tax_amount, date, vendor_name, payment_mode, reference_no, notes, description } = req.body;
     
@@ -88,7 +88,7 @@ exports.createExpense = async (req, res) => {
   }
 };
 
-exports.deleteExpense = async (req, res) => {
+export const deleteExpense = async (req, res) => {
   try {
     const { id } = req.params;
     const deleted = await Expense.findOneAndDelete({ id, organization_id: req.user.organization_id });
@@ -99,4 +99,11 @@ exports.deleteExpense = async (req, res) => {
   } catch (err) {
     res.status(500).json({ detail: err.message });
   }
+};
+
+export default {
+  getExpenses,
+  getExpenseSummary,
+  createExpense,
+  deleteExpense
 };

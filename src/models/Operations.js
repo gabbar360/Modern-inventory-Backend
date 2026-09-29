@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 // Journal Entry (Accounting / Double-Entry Ledger)
 const JournalLineSchema = new mongoose.Schema({
@@ -111,13 +111,22 @@ const ApprovalSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now }
 });
 
-module.exports = {
-  JournalEntry: mongoose.models.JournalEntry || mongoose.model('JournalEntry', JournalEntrySchema),
-  AutomationRule: mongoose.models.AutomationRule || mongoose.model('AutomationRule', AutomationRuleSchema),
-  Template: mongoose.models.Template || mongoose.model('Template', TemplateSchema),
-  Broadcast: mongoose.models.Broadcast || mongoose.model('Broadcast', BroadcastSchema),
-  Dispatch: mongoose.models.Dispatch || mongoose.model('Dispatch', DispatchSchema),
-  Challan: mongoose.models.Challan || mongoose.model('Challan', ChallanSchema),
-  Payment: mongoose.models.Payment || mongoose.model('Payment', PaymentSchema),
-  Approval: mongoose.models.Approval || mongoose.model('Approval', ApprovalSchema)
+export const JournalEntry = mongoose.models.JournalEntry || mongoose.model('JournalEntry', JournalEntrySchema);
+export const AutomationRule = mongoose.models.AutomationRule || mongoose.model('AutomationRule', AutomationRuleSchema);
+export const Template = mongoose.models.Template || mongoose.model('Template', TemplateSchema);
+export const Broadcast = mongoose.models.Broadcast || mongoose.model('Broadcast', BroadcastSchema);
+export const Dispatch = mongoose.models.Dispatch || mongoose.model('Dispatch', DispatchSchema);
+export const Challan = mongoose.models.Challan || mongoose.model('Challan', ChallanSchema);
+export const Payment = mongoose.models.Payment || mongoose.model('Payment', PaymentSchema);
+export const Approval = mongoose.models.Approval || mongoose.model('Approval', ApprovalSchema);
+
+export default {
+  JournalEntry,
+  AutomationRule,
+  Template,
+  Broadcast,
+  Dispatch,
+  Challan,
+  Payment,
+  Approval
 };

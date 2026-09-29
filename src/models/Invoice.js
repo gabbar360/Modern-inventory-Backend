@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const DocumentItemSchema = new mongoose.Schema({
   product_id: { type: String, default: 'prd_custom' },
@@ -85,8 +85,8 @@ const SalesOrderSchema = new mongoose.Schema({
   updated_at: { type: Date, default: Date.now }
 });
 
-module.exports = {
-  Invoice: mongoose.models.Invoice || mongoose.model('Invoice', InvoiceSchema),
-  Quotation: mongoose.models.Quotation || mongoose.model('Quotation', QuotationSchema),
-  SalesOrder: mongoose.models.SalesOrder || mongoose.model('SalesOrder', SalesOrderSchema)
-};
+export const Invoice = mongoose.models.Invoice || mongoose.model('Invoice', InvoiceSchema);
+export const Quotation = mongoose.models.Quotation || mongoose.model('Quotation', QuotationSchema);
+export const SalesOrder = mongoose.models.SalesOrder || mongoose.model('SalesOrder', SalesOrderSchema);
+
+export default { Invoice, Quotation, SalesOrder };

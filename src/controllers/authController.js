@@ -1,10 +1,11 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
-const { User, Organization } = require('../models/User');
-const { JWT_SECRET } = require('../config/env');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
+import { User, Organization } from '../models/User.js';
 
-exports.register = async (req, res) => {
+const JWT_SECRET = process.env.JWT_SECRET || 'vegnar_erp_super_secret_jwt_key_2026_prod';
+
+export const register = async (req, res) => {
   try {
     const { name, email, password, org_name, phone } = req.body;
     if (!email || !password || !name) {
@@ -52,7 +53,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -82,7 +83,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.getMe = async (req, res) => {
+export const getMe = async (req, res) => {
   try {
     const user = await User.findOne({ id: req.user.id });
     if (!user) return res.status(404).json({ detail: 'User not found' });
@@ -92,7 +93,7 @@ exports.getMe = async (req, res) => {
   }
 };
 
-exports.getUsers = async (req, res) => {
+export const getUsers = async (req, res) => {
   try {
     const users = await User.find({ organization_id: req.user.organization_id }).select('-password_hash');
     res.json(users);
@@ -101,6 +102,14 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-exports.logout = (req, res) => {
+export const logout = (req, res) => {
   res.json({ message: 'Logged out successfully' });
+};
+
+export default {
+  register,
+  login,
+  getMe,
+  getUsers,
+  logout
 };

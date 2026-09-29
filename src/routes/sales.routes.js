@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import salesController from '../controllers/salesController.js';
+import { authenticateToken } from '../middlewares/auth.js';
+
 const router = express.Router();
-const salesController = require('../controllers/salesController');
-const { authenticateToken } = require('../middlewares/auth');
 
 router.use(authenticateToken);
 
@@ -33,4 +34,4 @@ router.get('/sales-orders/:id', salesController.getSalesOrderById);
 router.post('/sales-orders/:id/status', salesController.updateSalesOrderStatus);
 router.post('/sales-orders', salesController.createSalesOrder);
 
-module.exports = router;
+export default router;

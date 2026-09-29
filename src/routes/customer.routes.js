@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import customerController from '../controllers/customerController.js';
+import { authenticateToken } from '../middlewares/auth.js';
+
 const router = express.Router();
-const customerController = require('../controllers/customerController');
-const { authenticateToken } = require('../middlewares/auth');
 
 router.use(authenticateToken);
 
@@ -24,4 +25,4 @@ router.put('/leads/:id', customerController.updateLead);
 router.patch('/leads/:id', customerController.updateLead);
 router.delete('/leads/:id', (req, res) => res.json({ message: 'Lead deleted successfully' }));
 
-module.exports = router;
+export default router;

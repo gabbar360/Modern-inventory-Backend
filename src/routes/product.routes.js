@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import productController from '../controllers/productController.js';
+import { authenticateToken } from '../middlewares/auth.js';
+
 const router = express.Router();
-const productController = require('../controllers/productController');
-const { authenticateToken } = require('../middlewares/auth');
 
 router.use(authenticateToken);
 
@@ -16,4 +17,4 @@ router.delete('/products/:id', productController.deleteProduct);
 router.get('/brands', productController.getBrands);
 router.post('/brands', productController.createBrand);
 
-module.exports = router;
+export default router;

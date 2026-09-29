@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const OrganizationSchema = new mongoose.Schema({
   id: { type: String, required: true },
@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema({
   updated_at: { type: Date, default: Date.now }
 });
 
-module.exports = {
-  Organization: mongoose.models.Organization || mongoose.model('Organization', OrganizationSchema),
-  User: mongoose.models.User || mongoose.model('User', UserSchema)
-};
+export const Organization = mongoose.models.Organization || mongoose.model('Organization', OrganizationSchema);
+export const User = mongoose.models.User || mongoose.model('User', UserSchema);
+
+export default { Organization, User };

@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import expenseController from '../controllers/expenseController.js';
+import { authenticateToken } from '../middlewares/auth.js';
+
 const router = express.Router();
-const expenseController = require('../controllers/expenseController');
-const { authenticateToken } = require('../middlewares/auth');
 
 router.use(authenticateToken);
 
@@ -10,4 +11,4 @@ router.get('/summary', expenseController.getExpenseSummary);
 router.post('/', expenseController.createExpense);
 router.delete('/:id', expenseController.deleteExpense);
 
-module.exports = router;
+export default router;

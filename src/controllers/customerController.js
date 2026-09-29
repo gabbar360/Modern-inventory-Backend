@@ -1,10 +1,10 @@
-const { v4: uuidv4 } = require('uuid');
-const { Customer, Lead } = require('../models/Customer');
-const { Invoice, Quotation, SalesOrder } = require('../models/Invoice');
-const { Payment } = require('../models/Operations');
+import { v4 as uuidv4 } from 'uuid';
+import { Customer, Lead } from '../models/Customer.js';
+import { Invoice, Quotation, SalesOrder } from '../models/Invoice.js';
+import { Payment } from '../models/Operations.js';
 
 // ---------------- CUSTOMERS ----------------
-exports.getCustomers = async (req, res) => {
+export const getCustomers = async (req, res) => {
   try {
     const customers = await Customer.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
     res.json(customers);
@@ -13,7 +13,7 @@ exports.getCustomers = async (req, res) => {
   }
 };
 
-exports.getCustomerById = async (req, res) => {
+export const getCustomerById = async (req, res) => {
   try {
     const customer = await Customer.findOne({ id: req.params.id, organization_id: req.user.organization_id }).lean();
     if (!customer) return res.status(404).json({ detail: 'Customer not found' });
@@ -37,7 +37,7 @@ exports.getCustomerById = async (req, res) => {
   }
 };
 
-exports.createCustomer = async (req, res) => {
+export const createCustomer = async (req, res) => {
   try {
     const id = `cust_${uuidv4().slice(0, 8)}`;
     const portal_token = uuidv4();
@@ -53,7 +53,7 @@ exports.createCustomer = async (req, res) => {
   }
 };
 
-exports.updateCustomer = async (req, res) => {
+export const updateCustomer = async (req, res) => {
   try {
     const customer = await Customer.findOneAndUpdate(
       { id: req.params.id, organization_id: req.user.organization_id },
@@ -67,7 +67,7 @@ exports.updateCustomer = async (req, res) => {
   }
 };
 
-exports.deleteCustomer = async (req, res) => {
+export const deleteCustomer = async (req, res) => {
   try {
     await Customer.findOneAndDelete({ id: req.params.id, organization_id: req.user.organization_id });
     res.json({ message: 'Customer deleted successfully' });
@@ -77,7 +77,7 @@ exports.deleteCustomer = async (req, res) => {
 };
 
 // ---------------- LEADS ----------------
-exports.getLeads = async (req, res) => {
+export const getLeads = async (req, res) => {
   try {
     const leads = await Lead.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
     res.json(leads);
@@ -86,7 +86,7 @@ exports.getLeads = async (req, res) => {
   }
 };
 
-exports.createLead = async (req, res) => {
+export const createLead = async (req, res) => {
   try {
     const id = `lead_${uuidv4().slice(0, 8)}`;
     const lead = await Lead.create({
@@ -100,7 +100,7 @@ exports.createLead = async (req, res) => {
   }
 };
 
-exports.updateLead = async (req, res) => {
+export const updateLead = async (req, res) => {
   try {
     const lead = await Lead.findOneAndUpdate(
       { id: req.params.id, organization_id: req.user.organization_id },
@@ -115,7 +115,7 @@ exports.updateLead = async (req, res) => {
 };
 
 // ---------------- CUSTOMER SUB-RESOURCES ----------------
-exports.getCustomerActivity = async (req, res) => {
+export const getCustomerActivity = async (req, res) => {
   try {
     const { id } = req.params;
     res.json({
@@ -130,7 +130,7 @@ exports.getCustomerActivity = async (req, res) => {
   }
 };
 
-exports.getPortalLink = async (req, res) => {
+export const getPortalLink = async (req, res) => {
   try {
     const { id } = req.params;
     const customer = await Customer.findOne({ id, organization_id: req.user.organization_id });
@@ -141,12 +141,12 @@ exports.getPortalLink = async (req, res) => {
   }
 };
 
-exports.getCustomerStatementPdf = async (req, res) => {
+export const getCustomerStatementPdf = async (req, res) => {
   res.setHeader('Content-Type', 'application/pdf');
   res.send(Buffer.from('%PDF-1.4 Mock Customer Statement PDF Content', 'utf-8'));
 };
 
-exports.sendCustomerStatement = async (req, res) => {
+export const sendCustomerStatement = async (req, res) => {
   try {
     const { id } = req.params;
     const customer = await Customer.findOne({ id, organization_id: req.user.organization_id });
@@ -154,4 +154,19 @@ exports.sendCustomerStatement = async (req, res) => {
   } catch (err) {
     res.status(500).json({ detail: err.message });
   }
+};
+
+export default {
+  getCustomers,
+  getCustomerById,
+  createCustomer,
+  updateCustomer,
+  deleteCustomer,
+  getLeads,
+  createLead,
+  updateLead,
+  getCustomerActivity,
+  getPortalLink,
+  getCustomerStatementPdf,
+  sendCustomerStatement
 };

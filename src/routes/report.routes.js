@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import reportController from '../controllers/reportController.js';
+import { authenticateToken } from '../middlewares/auth.js';
+
 const router = express.Router();
-const reportController = require('../controllers/reportController');
-const { authenticateToken } = require('../middlewares/auth');
 
 router.use(authenticateToken);
 
@@ -15,4 +16,4 @@ router.get('/expenses', reportController.getExpenses);
 router.get('/gst-summary', reportController.getGstSummary);
 router.get('/receivables-aging', reportController.getReceivablesAging);
 
-module.exports = router;
+export default router;

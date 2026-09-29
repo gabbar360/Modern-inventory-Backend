@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const connectDB = async () => {
   const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/vegnar_crm';
@@ -12,7 +12,7 @@ const connectDB = async () => {
   } catch (error) {
     console.warn(`[MongoDB] Connection Warning (${error.message}). Attempting fallback memory/local server...`);
     try {
-      const { MongoMemoryServer } = require('mongodb-memory-server');
+      const { MongoMemoryServer } = await import('mongodb-memory-server');
       const mongoServer = await MongoMemoryServer.create();
       const uri = mongoServer.getUri();
       const conn = await mongoose.connect(uri);
@@ -25,4 +25,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+export default connectDB;
