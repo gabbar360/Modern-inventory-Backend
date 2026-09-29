@@ -1,0 +1,43 @@
+# ==========================================
+# Production Backend GitIgnore - Node.js / Express / Mongoose
+# ==========================================
+
+# Dependency Directories
+node_modules/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Build & TypeScript Outputs
+dist/
+build/
+*.js.map
+
+# Logs & Debugging
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database & Dump Files
+*.db
+*.sqlite
+*.sqlite3
+dump/
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Testing & Temporary Files
+coverage/
+.nyc_output/
+tmp/
+temp/
