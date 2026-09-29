@@ -17,36 +17,25 @@ export const DocumentItemSchema = new mongoose.Schema({
 });
 
 
-export const InvoiceSchema = new mongoose.Schema({
+export const SalesOrderSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   organization_id: { type: String, required: true },
-  invoice_number: { type: String, required: true },
+  order_number: { type: String, required: true },
+  number: { type: String },
   customer_id: { type: String, required: true },
   customer_name: { type: String, default: 'Valued Customer' },
-  customer_gstin: { type: String, default: '' },
   items: [DocumentItemSchema],
   subtotal: { type: Number, default: 0 },
   total_tax: { type: Number, default: 0 },
-  cgst: { type: Number, default: 0 },
-  sgst: { type: Number, default: 0 },
-  igst: { type: Number, default: 0 },
   total: { type: Number, default: 0 },
   grand_total: { type: Number, default: 0 },
-  paid_amount: { type: Number, default: 0 },
-  balance_due: { type: Number, default: 0 },
   status: { type: String, default: 'Draft' },
-  invoice_date: { type: Date, default: Date.now },
-  due_date: { type: Date },
-  eway_bill_number: { type: String, default: '' },
-  eway_bill_status: { type: String, default: '' },
-  shipping_status: { type: String, default: 'Pending' },
+  expected_delivery: { type: Date },
+  order_date: { type: Date, default: Date.now },
   notes: { type: String, default: '' },
-  terms: { type: String, default: '' },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now }
 });
 
-export const Invoice = mongoose.models.Invoice || mongoose.model('Invoice', InvoiceSchema);
-export { Quotation } from './Quotation.js';
-export { SalesOrder } from './SalesOrder.js';
-export default Invoice;
+export const SalesOrder = mongoose.models.SalesOrder || mongoose.model('SalesOrder', SalesOrderSchema);
+export default SalesOrder;

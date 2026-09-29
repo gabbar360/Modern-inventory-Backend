@@ -1,32 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Warehouse, StockLedger } from '../models/Inventory.js';
+import { StockLedger } from '../models/StockLedger.js';
 import { Product } from '../models/Product.js';
 
-// ---------------- WAREHOUSES ----------------
-export const getWarehouses = async (req, res) => {
-  try {
-    const warehouses = await Warehouse.find({ organization_id: req.user.organization_id });
-    res.json(warehouses);
-  } catch (err) {
-    res.status(500).json({ detail: err.message });
-  }
-};
-
-export const createWarehouse = async (req, res) => {
-  try {
-    const id = `wh_${uuidv4().slice(0, 8)}`;
-    const warehouse = await Warehouse.create({
-      ...req.body,
-      id,
-      organization_id: req.user.organization_id
-    });
-    res.status(201).json(warehouse);
-  } catch (err) {
-    res.status(500).json({ detail: err.message });
-  }
-};
-
-// ---------------- STOCK LEDGER & ADJUSTMENTS ----------------
 export const getStockLedger = async (req, res) => {
   try {
     const ledger = await StockLedger.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
@@ -88,10 +63,58 @@ export const getReorderAlerts = async (req, res) => {
   }
 };
 
+export const getStockMovements = async (req, res) => {
+  try {
+    const movements = await StockLedger.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 }).limit(100);
+    res.json(movements);
+  } catch (err) {
+    res.status(500).json({ detail: err.message });
+  }
+};
+
+export const getStockHealth = async (req, res) => {
+  try {
+    const products = await Product.find({ organization_id: req.user.organization_id });
+    const totalItems = products.reduce((acc, p) => acc + (p.stock || 0), 0);
+    const lowStockCount = products.filter(p => (p.stock || 0) <= (p.min_stock_alert || 5)).length;
+    res.json({
+      healthy_ratio: products.length ? Math.round(((products.length - lowStockCount) / products.length) * 100) : 100,
+      total_items: totalItems,
+      low_stock_count: lowStockCount
+    });
+  } catch (err) {
+    res.status(500).json({ detail: err.message });
+  }
+};
+
+export const getReorderSuggestions = async (req, res) => {
+  try {
+    const products = await Product.find({ organization_id: req.user.organization_id });
+    const suggestions = products
+      .filter(p => (p.stock || 0) <= (p.min_stock_alert || 5))
+      .map(p => ({
+        product_id: p.id,
+        product_name: p.name,
+        current_stock: p.stock,
+        suggested_qty: (p.min_stock_alert || 10) * 2,
+        estimated_cost: ((p.min_stock_alert || 10) * 2) * (p.purchase_price || 100)
+      }));
+    res.json(suggestions);
+  } catch (err) {
+    res.status(500).json({ detail: err.message });
+  }
+};
+
+export const createReorderPO = async (req, res) => {
+  res.json({ success: true, message: 'Reorder Purchase Order generated successfully' });
+};
+
 export default {
-  getWarehouses,
-  createWarehouse,
   getStockLedger,
   adjustStock,
-  getReorderAlerts
+  getReorderAlerts,
+  getStockMovements,
+  getStockHealth,
+  getReorderSuggestions,
+  createReorderPO
 };

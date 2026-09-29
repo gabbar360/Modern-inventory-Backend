@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Customer, Lead } from '../models/Customer.js';
-import { Invoice, Quotation, SalesOrder } from '../models/Invoice.js';
-import { Payment } from '../models/Operations.js';
+import { Customer } from '../models/Customer.js';
+import { Invoice } from '../models/Invoice.js';
+import { Quotation } from '../models/Quotation.js';
+import { SalesOrder } from '../models/SalesOrder.js';
+import { Payment } from '../models/Payment.js';
 
-// ---------------- CUSTOMERS ----------------
 export const getCustomers = async (req, res) => {
   try {
     const customers = await Customer.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
@@ -20,9 +21,9 @@ export const getCustomerById = async (req, res) => {
 
     const [invoices, quotations, orders, payments] = await Promise.all([
       Invoice.find({ customer_id: req.params.id, organization_id: req.user.organization_id }).lean(),
-      Quotation ? Quotation.find({ customer_id: req.params.id, organization_id: req.user.organization_id }).lean() : Promise.resolve([]),
-      SalesOrder ? SalesOrder.find({ customer_id: req.params.id, organization_id: req.user.organization_id }).lean() : Promise.resolve([]),
-      Payment ? Payment.find({ customer_id: req.params.id, organization_id: req.user.organization_id }).lean() : Promise.resolve([])
+      Quotation.find({ customer_id: req.params.id, organization_id: req.user.organization_id }).lean(),
+      SalesOrder.find({ customer_id: req.params.id, organization_id: req.user.organization_id }).lean(),
+      Payment.find({ customer_id: req.params.id, organization_id: req.user.organization_id }).lean()
     ]);
 
     res.json({
@@ -76,45 +77,6 @@ export const deleteCustomer = async (req, res) => {
   }
 };
 
-// ---------------- LEADS ----------------
-export const getLeads = async (req, res) => {
-  try {
-    const leads = await Lead.find({ organization_id: req.user.organization_id }).sort({ created_at: -1 });
-    res.json(leads);
-  } catch (err) {
-    res.status(500).json({ detail: err.message });
-  }
-};
-
-export const createLead = async (req, res) => {
-  try {
-    const id = `lead_${uuidv4().slice(0, 8)}`;
-    const lead = await Lead.create({
-      ...req.body,
-      id,
-      organization_id: req.user.organization_id
-    });
-    res.status(201).json(lead);
-  } catch (err) {
-    res.status(500).json({ detail: err.message });
-  }
-};
-
-export const updateLead = async (req, res) => {
-  try {
-    const lead = await Lead.findOneAndUpdate(
-      { id: req.params.id, organization_id: req.user.organization_id },
-      { ...req.body, updated_at: Date.now() },
-      { new: true }
-    );
-    if (!lead) return res.status(404).json({ detail: 'Lead not found' });
-    res.json(lead);
-  } catch (err) {
-    res.status(500).json({ detail: err.message });
-  }
-};
-
-// ---------------- CUSTOMER SUB-RESOURCES ----------------
 export const getCustomerActivity = async (req, res) => {
   try {
     const { id } = req.params;
@@ -162,9 +124,6 @@ export default {
   createCustomer,
   updateCustomer,
   deleteCustomer,
-  getLeads,
-  createLead,
-  updateLead,
   getCustomerActivity,
   getPortalLink,
   getCustomerStatementPdf,

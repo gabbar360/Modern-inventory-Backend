@@ -1,26 +1,7 @@
 import mongoose from 'mongoose';
+import { OrganizationSchema } from './Organization.js';
 
-const OrganizationSchema = new mongoose.Schema({
-  id: { type: String, required: true },
-  name: { type: String, required: true },
-  gstin: { type: String, default: '' },
-  email: { type: String, default: '' },
-  phone: { type: String, default: '' },
-  address: { type: String, default: '' },
-  pincode: { type: String, default: '' },
-  city: { type: String, default: '' },
-  state: { type: String, default: '' },
-  logo_url: { type: String, default: '' },
-  bank_details: {
-    account_number: { type: String, default: '' },
-    ifsc: { type: String, default: '' },
-    bank_name: { type: String, default: '' },
-    branch: { type: String, default: '' },
-  },
-  created_at: { type: Date, default: Date.now }
-});
-
-const UserSchema = new mongoose.Schema({
+export const UserSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -34,7 +15,6 @@ const UserSchema = new mongoose.Schema({
   updated_at: { type: Date, default: Date.now }
 });
 
-export const Organization = mongoose.models.Organization || mongoose.model('Organization', OrganizationSchema);
 export const User = mongoose.models.User || mongoose.model('User', UserSchema);
-
-export default { Organization, User };
+export { Organization } from './Organization.js';
+export default User;

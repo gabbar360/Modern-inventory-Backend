@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const ProductSchema = new mongoose.Schema({
+export const ProductSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   organization_id: { type: String, required: true },
   name: { type: String, required: true },
@@ -23,15 +23,6 @@ const ProductSchema = new mongoose.Schema({
   updated_at: { type: Date, default: Date.now }
 });
 
-const BrandSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
-  organization_id: { type: String, required: true },
-  name: { type: String, required: true },
-  description: { type: String, default: '' },
-  created_at: { type: Date, default: Date.now }
-});
-
 export const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema);
-export const Brand = mongoose.models.Brand || mongoose.model('Brand', BrandSchema);
-
-export default { Product, Brand };
+export { Brand } from './Brand.js';
+export default Product;
