@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const connectDB = async () => {
-  const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/vegnar_crm';
+  const MONGO_URL = process.env.MONGO_URL;
   
   try {
     const conn = await mongoose.connect(MONGO_URL, {
