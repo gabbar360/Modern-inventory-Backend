@@ -1,12 +1,14 @@
-export const requireRole = (allowedRoles = []) => {
+export const requireRole = (allowedSlugs = []) => {
   return (req, res, next) => {
-    if (!req.user) {
+    if (!req.user)
       return res.status(401).json({ detail: 'Unauthorized access' });
-    }
 
-    if (allowedRoles.length > 0 && !allowedRoles.includes(req.user.role)) {
+    // SUPER_ADMIN ko hamesha allow karo
+    if (req.user.role === 'SUPER_ADMIN') return next();
+
+    if (allowedSlugs.length > 0 && !allowedSlugs.includes(req.user.role)) {
       return res.status(403).json({
-        detail: `Access denied. Role '${req.user.role}' lacks sufficient permissions.`
+        detail: `Access denied. Role '${req.user.role}' lacks sufficient permissions.`,
       });
     }
 

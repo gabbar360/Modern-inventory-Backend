@@ -1,4 +1,5 @@
 import express from 'express';
+import roleRoutes from './role.routes.js';
 import authRoutes from './auth.routes.js';
 import organizationRoutes from './organization.routes.js';
 import customerRoutes from './customer.routes.js';
@@ -41,6 +42,7 @@ router.get('/health', (req, res) => {
 
 // Mounted Routes
 router.use('/auth', authRoutes);
+router.use('/roles', roleRoutes);
 router.use('/', organizationRoutes);
 router.use('/', customerRoutes);
 router.use('/', leadRoutes);
