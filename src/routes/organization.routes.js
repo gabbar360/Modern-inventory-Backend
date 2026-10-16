@@ -6,8 +6,7 @@ const router = express.Router();
 router.use(authenticateToken);
 
 router.patch('/organization', organizationController.updateOrganization);
-router.post('/custom-fields', organizationController.saveCustomFields);
-router.post('/import', organizationController.importData);
+router.patch('/organizations/me', organizationController.updateOrganization);
 router.get('/users', organizationController.getUsers);
 router.post('/users', organizationController.inviteUser);
 router.patch('/users/:id/role', organizationController.updateUserRole);
