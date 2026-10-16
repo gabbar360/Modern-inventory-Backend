@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { OrganizationSchema } from './Organization.js';
 
 export const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -16,7 +15,6 @@ export const UserSchema = new mongoose.Schema({
     ref: 'Organization',
     default: null,
   },
-  organization: { type: OrganizationSchema, default: null },
   phone: { type: String, default: '' },
   status: { type: String, enum: ['active', 'inactive'], default: 'active' },
   created_at: { type: Date, default: Date.now },
@@ -24,5 +22,4 @@ export const UserSchema = new mongoose.Schema({
 });
 
 export const User = mongoose.models.User || mongoose.model('User', UserSchema);
-export { Organization } from './Organization.js';
 export default User;

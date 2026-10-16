@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User, Organization } from '../models/User.js';
+import User from '../models/User.js';
+import Organization from '../models/Organization.js';
 import { Role } from '../models/Role.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'vegnar_erp_super_secret_jwt_key_2026_prod';
@@ -28,6 +29,10 @@ export const login = async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    const org = user.organization_id
+      ? await Organization.findById(user.organization_id)
+      : null;
+
     res.json({
       access_token: token,
       token_type: 'bearer',
@@ -38,7 +43,7 @@ export const login = async (req, res) => {
         role: roleSlug,
         roleId: user.roleId?._id,
       },
-      organization: user.organization || null,
+      organization: org,
     });
   } catch (err) {
     res.status(500).json({ detail: err.message });
@@ -75,7 +80,6 @@ export const register = async (req, res) => {
       password_hash,
       roleId: adminRole._id,
       organization_id: org._id,
-      organization: org,
       phone: phone || '',
     });
 
@@ -100,9 +104,12 @@ export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate('roleId').select('-password_hash');
     if (!user) return res.status(404).json({ detail: 'User not found' });
+    const org = user.organization_id
+      ? await Organization.findById(user.organization_id)
+      : null;
     res.json({
       user: { ...user.toObject(), role: user.roleId?.slug },
-      organization: user.organization || null,
+      organization: org,
     });
   } catch (err) {
     res.status(500).json({ detail: err.message });
@@ -120,8 +127,47 @@ export const getUsers = async (req, res) => {
   }
 };
 
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, email, phone } = req.body;
+    const updates = {};
+    if (name) updates.name = name;
+    if (email) updates.email = email.toLowerCase();
+    if (phone !== undefined) updates.phone = phone;
+    updates.updated_at = new Date();
+
+    const user = await User.findByIdAndUpdate(req.user.id, { $set: updates }, { new: true })
+      .populate('roleId').select('-password_hash');
+    if (!user) return res.status(404).json({ detail: 'User not found' });
+    res.json({ user: { ...user.toObject(), role: user.roleId?.slug } });
+  } catch (err) {
+    res.status(500).json({ detail: err.message });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { current_password, new_password } = req.body;
+    if (!current_password || !new_password)
+      return res.status(400).json({ detail: 'current_password and new_password are required' });
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ detail: 'User not found' });
+
+    const valid = await bcrypt.compare(current_password, user.password_hash);
+    if (!valid) return res.status(400).json({ detail: 'Current password is incorrect' });
+
+    user.password_hash = await bcrypt.hash(new_password, 10);
+    user.updated_at = new Date();
+    await user.save();
+    res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    res.status(500).json({ detail: err.message });
+  }
+};
+
 export const logout = (req, res) => {
   res.json({ message: 'Logged out successfully' });
 };
 
-export default { login, register, getMe, getUsers, logout };
+export default { login, register, getMe, getUsers, updateProfile, changePassword, logout };

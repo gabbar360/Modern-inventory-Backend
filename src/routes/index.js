@@ -14,33 +14,28 @@ import purchaseOrderRoutes from './purchaseOrder.routes.js';
 import vendorBillRoutes from './vendorBill.routes.js';
 import warehouseRoutes from './warehouse.routes.js';
 import stockLedgerRoutes from './stockLedger.routes.js';
-import taskRoutes from './task.routes.js';
 import auditLogRoutes from './auditLog.routes.js';
 import journalRoutes from './journal.routes.js';
 import automationRoutes from './automation.routes.js';
 import templateRoutes from './template.routes.js';
-import broadcastRoutes from './broadcast.routes.js';
 import dispatchRoutes from './dispatch.routes.js';
 import challanRoutes from './challan.routes.js';
 import paymentRoutes from './payment.routes.js';
-import approvalRoutes from './approval.routes.js';
 import dashboardRoutes from './dashboard.routes.js';
 import expenseRoutes from './expense.routes.js';
 import reportRoutes from './report.routes.js';
 
 const router = express.Router();
 
-// Health Check
 router.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
-    service: 'Vegnar ERP & CRM Node.js/MongoDB Modular API v2 (Fully Separated MVC)'
+    service: 'Vegnar ERP & CRM Node.js/MongoDB Modular API v2'
   });
 });
 
-// Mounted Routes
 router.use('/auth', authRoutes);
 router.use('/roles', roleRoutes);
 router.use('/', organizationRoutes);
@@ -56,16 +51,13 @@ router.use('/', purchaseOrderRoutes);
 router.use('/', vendorBillRoutes);
 router.use('/', warehouseRoutes);
 router.use('/', stockLedgerRoutes);
-router.use('/', taskRoutes);
 router.use('/', auditLogRoutes);
 router.use('/', journalRoutes);
 router.use('/', automationRoutes);
 router.use('/', templateRoutes);
-router.use('/', broadcastRoutes);
 router.use('/', dispatchRoutes);
 router.use('/', challanRoutes);
 router.use('/', paymentRoutes);
-router.use('/', approvalRoutes);
 router.use('/', dashboardRoutes);
 router.use('/expenses', expenseRoutes);
 router.use('/reports', reportRoutes);
