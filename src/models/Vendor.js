@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 export const VendorSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   organization_id: { type: String, required: true },
-  name: { type: String, required: true },
+  name: { type: String, default: '' },
   company_name: { type: String, default: '' },
   email: { type: String, default: '' },
   phone: { type: String, default: '' },
@@ -19,7 +19,7 @@ export const VendorSchema = new mongoose.Schema({
   notes: { type: String, default: '' },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now }
-});
+}, { strict: false });
 
 export const Vendor = mongoose.models.Vendor || mongoose.model('Vendor', VendorSchema);
 export { PurchaseOrder } from './PurchaseOrder.js';

@@ -40,11 +40,18 @@ export const getCustomerById = async (req, res) => {
 
 export const createCustomer = async (req, res) => {
   try {
-    const id = `cust_${uuidv4().slice(0, 8)}`;
-    const portal_token = uuidv4();
+    const id = req.body.id || `cust_${uuidv4().slice(0, 8)}`;
+    const portal_token = req.body.portal_token || uuidv4();
+    const name = req.body.name || req.body.company_name || req.body.contact_person || 'Customer';
+    const company_name = req.body.company_name || name;
+    const phone = req.body.phone || req.body.mobile || '';
+
     const customer = await Customer.create({
       ...req.body,
       id,
+      name,
+      company_name,
+      phone,
       portal_token,
       organization_id: req.user.organization_id
     });
@@ -56,9 +63,14 @@ export const createCustomer = async (req, res) => {
 
 export const updateCustomer = async (req, res) => {
   try {
+    const updateData = { ...req.body, updated_at: Date.now() };
+    const name = req.body.name || req.body.company_name || req.body.contact_person;
+    if (name) updateData.name = name;
+    if (req.body.mobile && !req.body.phone) updateData.phone = req.body.mobile;
+
     const customer = await Customer.findOneAndUpdate(
       { id: req.params.id, organization_id: req.user.organization_id },
-      { ...req.body, updated_at: Date.now() },
+      updateData,
       { new: true }
     );
     if (!customer) return res.status(404).json({ detail: 'Customer not found' });

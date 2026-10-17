@@ -12,10 +12,17 @@ export const getVendors = async (req, res) => {
 
 export const createVendor = async (req, res) => {
   try {
-    const id = `vnd_${uuidv4().slice(0, 8)}`;
+    const id = req.body.id || `vnd_${uuidv4().slice(0, 8)}`;
+    const name = req.body.name || req.body.company_name || 'Vendor';
+    const company_name = req.body.company_name || name;
+    const phone = req.body.phone || req.body.mobile || '';
+
     const vendor = await Vendor.create({
       ...req.body,
       id,
+      name,
+      company_name,
+      phone,
       organization_id: req.user.organization_id
     });
     res.status(201).json(vendor);
