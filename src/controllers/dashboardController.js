@@ -4,68 +4,83 @@ import { Product } from '../models/Product.js';
 import { Expense } from '../models/Expense.js';
 import { Quotation } from '../models/Quotation.js';
 import { SalesOrder } from '../models/SalesOrder.js';
+import { Lead } from '../models/Lead.js';
 
 export const getDashboardStats = async (req, res) => {
   try {
     const orgId = req.user.organization_id;
-    const [invoices, customers, products, expenses, quotations, salesOrders] = await Promise.all([
+    const [invoices, customers, products, expenses, quotations, salesOrders, leads] = await Promise.all([
       Invoice.find({ organization_id: orgId }).lean(),
       Customer.find({ organization_id: orgId }).lean(),
       Product.find({ organization_id: orgId }).lean(),
       Expense.find({ organization_id: orgId }).lean(),
       Quotation.find({ organization_id: orgId }).lean(),
-      SalesOrder.find({ organization_id: orgId }).lean()
+      SalesOrder.find({ organization_id: orgId }).lean(),
+      Lead.find({ organization_id: orgId }).lean()
     ]);
 
-    const totalInvoiced = invoices.reduce((s, i) => s + (i.total || i.grand_total || 0), 0);
+    const totalInvoiced = invoices.reduce((s, i) => s + (i.grand_total || i.total || 0), 0);
     const totalPaid = invoices.reduce((s, i) => s + (i.paid_amount || 0), 0);
     const totalReceivable = invoices.reduce((s, i) => s + (i.balance_due || 0), 0);
 
-    const defaultSalesTrend = [
-      { month: "Jan", value: 120000 },
-      { month: "Feb", value: 240000 },
-      { month: "Mar", value: 380000 },
-      { month: "Apr", value: 510000 },
-      { month: "May", value: 780000 },
-      { month: "Jun", value: totalInvoiced || 1540000 }
-    ];
+    // Calculate dynamic last 6 months sales trend
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const now = new Date();
+    const sales_trend = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const mIndex = d.getMonth();
+      const year = d.getFullYear();
+      const mName = monthNames[mIndex];
 
-    const defaultPipeline = [
-      { stage: "new", count: 8 },
-      { stage: "contacted", count: 6 },
-      { stage: "proposal", count: 5 },
-      { stage: "won", count: 5 }
-    ];
+      const monthTotal = invoices
+        .filter(inv => {
+          const invDate = new Date(inv.invoice_date || inv.created_at);
+          return invDate.getMonth() === mIndex && invDate.getFullYear() === year;
+        })
+        .reduce((sum, inv) => sum + (inv.grand_total || inv.total || 0), 0);
 
-    const defaultTopCustomers = customers.slice(0, 5).map(c => ({
-      name: c.company_name || c.name || "Customer",
-      value: 250000
-    }));
-
-    if (defaultTopCustomers.length === 0) {
-      defaultTopCustomers.push(
-        { name: "Acme Corp", value: 450000 },
-        { name: "Apex Ltd", value: 320000 },
-        { name: "Starlight Inc", value: 280000 }
-      );
+      sales_trend.push({ month: mName, value: monthTotal });
     }
 
+    // Dynamic pipeline from real leads
+    const stages = ["new", "contacted", "proposal", "won"];
+    const pipeline = stages.map(stage => ({
+      stage,
+      count: leads.filter(l => (l.status || '').toLowerCase() === stage).length
+    }));
+
+    // Dynamic top customers by invoice totals
+    const customerSpendMap = {};
+    for (const inv of invoices) {
+      const cName = inv.customer_name || 'Customer';
+      const amt = (inv.grand_total || inv.total || 0);
+      customerSpendMap[cName] = (customerSpendMap[cName] || 0) + amt;
+    }
+    const top_customers = Object.entries(customerSpendMap)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+
+    const wonLeadsCount = leads.filter(l => (l.status || '').toLowerCase() === 'won').length;
+    const conversion_rate = leads.length > 0 ? Math.round((wonLeadsCount / leads.length) * 100) : 0;
+
     res.json({
-      total_sales: totalInvoiced || 1540000,
+      total_sales: totalInvoiced,
       total_invoiced: totalInvoiced,
-      receivable: totalReceivable || 320000,
-      cash_in: totalPaid || 1220000,
+      receivable: totalReceivable,
+      cash_in: totalPaid,
       total_revenue: totalPaid,
-      customers: customers.length || 48,
+      customers: customers.length,
       total_customers: customers.length,
-      open_quotes: quotations.length || 12,
-      confirmed_so: salesOrders.length || 18,
-      pending_invoices: invoices.filter(i => i.status !== "paid").length || 6,
-      new_leads: 24,
-      conversion_rate: 34,
-      sales_trend: defaultSalesTrend,
-      pipeline: defaultPipeline,
-      top_customers: defaultTopCustomers
+      open_quotes: quotations.filter(q => (q.status || '').toLowerCase() !== 'rejected' && (q.status || '').toLowerCase() !== 'cancelled').length,
+      confirmed_so: salesOrders.filter(so => (so.status || '').toLowerCase() === 'confirmed' || (so.status || '').toLowerCase() === 'approved').length,
+      pending_invoices: invoices.filter(i => (i.balance_due && i.balance_due > 0) || (i.status || '').toLowerCase() !== 'paid').length,
+      new_leads: leads.length,
+      conversion_rate,
+      sales_trend,
+      pipeline,
+      top_customers
     });
   } catch (err) {
     res.status(500).json({ detail: err.message });
